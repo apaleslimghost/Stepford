@@ -1,6 +1,23 @@
 var Browser = require('zombie');
 Browser.silent = true;
 
+function securePersonalInformation(options, browser) {
+	if(browser.query('title') !== 'enter your secure personal information') return;
+
+	var key = browser.query('#logonBody input').name;
+
+	if(key === 'memorableDay') {
+		browser
+			.fill('memorableDay',   options.memorableDate[0])
+			.fill('memorableMonth', options.memorableDate[1])
+			.fill('memorableYear',  options.memorableDate[2])
+	} else {
+		browser.fill(key, options[key]);
+	}
+
+	return browser.click('[name=ok]');
+}
+
 module.exports = function(options) {
 	var browser = new Browser();
 	browser.visit('https://banking.smile.co.uk/SmileWeb2/start.do').then(() => {
@@ -25,10 +42,10 @@ module.exports = function(options) {
 			.select('firstPassCodeDigit',  getDigit(first))
 			.select('secondPassCodeDigit', getDigit(second));
 
-		return browser.click('[name=ok]');
-	}).then(() => {
-		browser.assert.text('title', 'enter your secure personal information');
-	}).then(() => {
+	})
+	.then(() => securePersonalInformation(options, browser))
+	.then(() => securePersonalInformation(options, browser))
+	.then(() => {
 		console.log('DONE');
 	});
 };
