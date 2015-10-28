@@ -1,0 +1,24 @@
+{
+  "name": "stepford",
+  "version": "1.0.0",
+  "description": "Scrape Smile online banking",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/quarterto/Stepford.git"
+  },
+  "keywords": [
+    "smile",
+    "banking",
+    "scrape"
+  ],
+  "author": "Matt Brennan <matt@153.io>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/quarterto/Stepford/issues"
+  },
+  "homepage": "https://github.com/quarterto/Stepford#readme"
+}
