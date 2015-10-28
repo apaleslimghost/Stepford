@@ -22,6 +22,8 @@
   },
   "homepage": "https://github.com/quarterto/Stepford#readme",
   "dependencies": {
+    "moment": "^2.10.6",
+    "numeral": "^1.5.3",
     "zombie": "^4.1.0"
   }
 }
