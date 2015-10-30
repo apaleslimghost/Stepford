@@ -19,6 +19,15 @@ function parseTx(browser) {
 	}));
 }
 
+function parseStatement(browser) {
+	if(browser.query('td.error')) return [];
+
+	var data = parseTx(browser);
+	return browser.clickLink('[title=previous]').then(() => {
+		return parseStatement(browser).then(prev => prev.concat(data));
+	});
+}
+
 module.exports = function(options) {
 	var browser = new Browser();
 	return browser.visit('https://banking.smile.co.uk/SmileWeb2/start.do')
@@ -77,9 +86,7 @@ module.exports = function(options) {
 
 		return browser.clickLink('[title="view previous statements"]')
 		.then(() => browser.clickLink('[title="click here to go to statement"]'))
-		.then(() => {
-			var page = parseTx(browser);
-			return recent.concat(page);
-		});
+		.then(() => parseStatement(browser))
+		.then(data => recent.concat(data).sort((a, b) => a.date - b.date));
 	});
 };
