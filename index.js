@@ -1,7 +1,12 @@
 var moment = require('moment');
 var numeral = require('numeral');
 var Browser = require('zombie');
+var spinner = require('elegant-spinner');
+var logUpdate = require('log-update');
 Browser.silent = true;
+
+var tickSpinner = spinner();
+var spin = () => logUpdate(tickSpinner());
 
 function parseTx(browser) {
 	return browser.queryAll('.summaryTable tbody tr')
@@ -20,7 +25,9 @@ function parseTx(browser) {
 }
 
 function parseStatement(browser) {
-	if(browser.query('td.error')) return [];
+	tick();
+
+	if(browser.query('td.error')) return Promise.resolve([]);
 
 	var data = parseTx(browser);
 	return browser.clickLink('[title=previous]').then(() => {
@@ -30,8 +37,10 @@ function parseStatement(browser) {
 
 module.exports = function(options) {
 	var browser = new Browser();
+	tick();
 	return browser.visit('https://banking.smile.co.uk/SmileWeb2/start.do')
 	.then(() => {
+		tick();
 		browser
 			.fill('sortCode', options.sortcode)
 			.fill('accountNumber', options.account);
@@ -39,6 +48,7 @@ module.exports = function(options) {
 		return browser.click('[name=ok]');
 	})
 	.then(() => {
+		tick();
 		browser.assert.text('title', 'enter your security code');
 		var first  = browser.query('[for=firstPassCodeDigit]') .textContent.match(/^(\w+)/)[1];
 		var second = browser.query('[for=secondPassCodeDigit]').textContent.match(/^(\w+)/)[1];
@@ -57,6 +67,7 @@ module.exports = function(options) {
 		return browser.click('[name=ok]');
 	})
 	.then(() => {
+		tick();
 		browser.assert.text('title', 'enter your secure personal information');
 		var key = browser.query('#logonBody input').name;
 
@@ -72,6 +83,7 @@ module.exports = function(options) {
 		return browser.click('[name=ok]');
 	})
 	.then(() => {
+		tick();
 		browser.assert.text('title', 'home'); // what
 		var acctCell = browser.queryAll('.dataRowBB').find(el =>
 			el.textContent.match(new RegExp(options.account))
@@ -81,6 +93,7 @@ module.exports = function(options) {
 		return browser.clickLink(linkCell.firstElementChild);
 	})
 	.then(() => {
+		tick();
 		browser.assert.text('title', 'recent items');
 		var recent = parseTx(browser);
 

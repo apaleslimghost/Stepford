@@ -22,6 +22,8 @@
   },
   "homepage": "https://github.com/quarterto/Stepford#readme",
   "dependencies": {
+    "elegant-spinner": "^1.0.1",
+    "log-update": "^1.0.2",
     "moment": "^2.10.6",
     "numeral": "^1.5.3",
     "zombie": "^4.1.0"
