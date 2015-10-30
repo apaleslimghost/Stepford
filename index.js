@@ -3,7 +3,21 @@ var numeral = require('numeral');
 var Browser = require('zombie');
 Browser.silent = true;
 
-
+function parseTx(browser) {
+	return browser.queryAll('.summaryTable tbody tr')
+	.filter(row => {
+		if(row.children[0].textContent.match(/last statement/)) return false;
+		if(row.children[1].textContent === 'BROUGHT FORWARD') return false;
+		return true;
+	})
+	.map(row => ({
+		date: moment(row.children[0].textContent, 'DD/MM/YYYY').toDate(),
+		payee: row.children[1].textContent,
+		amount: row.children[2].textContent.trim() ?
+			+numeral(row.children[2].textContent) :
+			-numeral(row.children[3].textContent)
+	}));
+}
 
 module.exports = function(options) {
 	var browser = new Browser();
@@ -59,13 +73,13 @@ module.exports = function(options) {
 	})
 	.then(() => {
 		browser.assert.text('title', 'recent items');
-		var rows = browser.queryAll('.summaryTable tbody tr').slice(0, -1);
-		return rows.map(row => ({
-			date: moment(row.children[0].textContent, 'DD/MM/YYYY').toDate(),
-			payee: row.children[1].textContent,
-			amount: row.children[2].textContent.trim() ?
-				+numeral(row.children[2].textContent) :
-				-numeral(row.children[3].textContent)
-		}));
+		var recent = parseTx(browser);
+
+		return browser.clickLink('[title="view previous statements"]')
+		.then(() => browser.clickLink('[title="click here to go to statement"]'))
+		.then(() => {
+			var page = parseTx(browser);
+			return recent.concat(page);
+		});
 	});
 };
