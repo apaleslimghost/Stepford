@@ -7,13 +7,12 @@ var c = require('chalk');
 Browser.silent = true;
 
 module.exports = function(options) {
-	var currentMessage = 'loading...';
+	var currentMessage = 'loading…';
 	var tickSpinner = spinner();
-	var log = (msg) => currentMessage = msg;
-	var t = setInterval(() => {
+	var log = options.silent ? () => {} : (msg) => currentMessage = msg;
+	var t = options.silent || setInterval(() => {
 		logUpdate(c.cyan.bold(tickSpinner()) + ' ' + c.grey(currentMessage));
 	}, 50);
-
 
 	var browser = new Browser();
 
@@ -34,7 +33,8 @@ module.exports = function(options) {
 	}
 
 	function parseStatement() {
-		log('parsing statement');
+		var p = browser.query('#recentItemsPageCount').textContent.match(/Page (\d+ of \d+)/)[1];
+		log('parsing statement page ' + p);
 
 		if(browser.query('td.error')) return Promise.resolve([]);
 
