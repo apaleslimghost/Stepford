@@ -3,44 +3,50 @@ var numeral = require('numeral');
 var Browser = require('zombie');
 var spinner = require('elegant-spinner');
 var logUpdate = require('log-update');
+var c = require('chalk');
 Browser.silent = true;
 
-var tickSpinner = spinner();
-var spin = () => logUpdate(tickSpinner());
-
-function parseTx(browser) {
-	return browser.queryAll('.summaryTable tbody tr')
-	.filter(row => {
-		if(row.children[0].textContent.match(/last statement/)) return false;
-		if(row.children[1].textContent === 'BROUGHT FORWARD') return false;
-		return true;
-	})
-	.map(row => ({
-		date: moment(row.children[0].textContent, 'DD/MM/YYYY').toDate(),
-		payee: row.children[1].textContent,
-		amount: row.children[2].textContent.trim() ?
-			+numeral(row.children[2].textContent) :
-			-numeral(row.children[3].textContent)
-	}));
-}
-
-function parseStatement(browser) {
-	tick();
-
-	if(browser.query('td.error')) return Promise.resolve([]);
-
-	var data = parseTx(browser);
-	return browser.clickLink('[title=previous]').then(() => {
-		return parseStatement(browser).then(prev => prev.concat(data));
-	});
-}
-
 module.exports = function(options) {
+	var currentMessage = 'loading...';
+	var tickSpinner = spinner();
+	var log = (msg) => currentMessage = msg;
+	var t = setInterval(() => {
+		logUpdate(c.cyan.bold(tickSpinner()) + ' ' + c.grey(currentMessage));
+	}, 50);
+
+
 	var browser = new Browser();
-	tick();
+
+	function parseTx() {
+		return browser.queryAll('.summaryTable tbody tr')
+		.filter(row => {
+			if(row.children[0].textContent.match(/last statement/)) return false;
+			if(row.children[1].textContent === 'BROUGHT FORWARD') return false;
+			return true;
+		})
+		.map(row => ({
+			date: moment(row.children[0].textContent, 'DD/MM/YYYY').toDate(),
+			payee: row.children[1].textContent,
+			amount: row.children[2].textContent.trim() ?
+				+numeral(row.children[2].textContent) :
+				-numeral(row.children[3].textContent)
+		}));
+	}
+
+	function parseStatement() {
+		log('parsing statement');
+
+		if(browser.query('td.error')) return Promise.resolve([]);
+
+		var data = parseTx(browser);
+		return browser.clickLink('[title=previous]').then(() => {
+			return parseStatement().then(prev => prev.concat(data));
+		});
+	}
+
 	return browser.visit('https://banking.smile.co.uk/SmileWeb2/start.do')
 	.then(() => {
-		tick();
+		log('login');
 		browser
 			.fill('sortCode', options.sortcode)
 			.fill('accountNumber', options.account);
@@ -48,7 +54,7 @@ module.exports = function(options) {
 		return browser.click('[name=ok]');
 	})
 	.then(() => {
-		tick();
+		log('security code');
 		browser.assert.text('title', 'enter your security code');
 		var first  = browser.query('[for=firstPassCodeDigit]') .textContent.match(/^(\w+)/)[1];
 		var second = browser.query('[for=secondPassCodeDigit]').textContent.match(/^(\w+)/)[1];
@@ -67,7 +73,7 @@ module.exports = function(options) {
 		return browser.click('[name=ok]');
 	})
 	.then(() => {
-		tick();
+		log('secure personal information');
 		browser.assert.text('title', 'enter your secure personal information');
 		var key = browser.query('#logonBody input').name;
 
@@ -83,7 +89,7 @@ module.exports = function(options) {
 		return browser.click('[name=ok]');
 	})
 	.then(() => {
-		tick();
+		log('home');
 		browser.assert.text('title', 'home'); // what
 		var acctCell = browser.queryAll('.dataRowBB').find(el =>
 			el.textContent.match(new RegExp(options.account))
@@ -93,7 +99,7 @@ module.exports = function(options) {
 		return browser.clickLink(linkCell.firstElementChild);
 	})
 	.then(() => {
-		tick();
+		log('parsing recent items');
 		browser.assert.text('title', 'recent items');
 		var recent = parseTx(browser);
 
@@ -101,5 +107,9 @@ module.exports = function(options) {
 		.then(() => browser.clickLink('[title="click here to go to statement"]'))
 		.then(() => parseStatement(browser))
 		.then(data => recent.concat(data).sort((a, b) => a.date - b.date));
+	}).then(d => {
+		clearInterval(t);
+		logUpdate(c.green('✔︎') + ' done!');
+		return d;
 	});
 };
