@@ -21,5 +21,8 @@ var write = out ? data => fs.writeFile(out, data, 'utf8') : console.log;
 
 stepford(options).then(
 	data => write(format(data)),
-	err  => console.error(err.stack)
+	err => {
+		console.error(err.stack);
+		process.exit(1);
+	}
 );
