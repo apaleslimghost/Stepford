@@ -17,7 +17,7 @@ module.exports = function(options) {
 	var browser = new Browser();
 
 	function parseTx() {
-		return browser.queryAll('.summaryTable tbody tr')
+		return browser.queryAll(':not(.verttop) > .summaryTable tbody tr')
 		.filter(row => {
 			if(row.children[0].textContent.match(/last statement/)) return false;
 			if(row.children[1].textContent === 'BROUGHT FORWARD') return false;
