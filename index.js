@@ -88,10 +88,11 @@ module.exports = function(options) {
 		var key = browser.query('#logonBody input').name;
 
 		if(key === 'memorableDay') {
+			let date = moment(options.memorableDate, 'YYYY-MM-DD');
 			browser
-			.fill('memorableDay',   options.memorableDate[0])
-			.fill('memorableMonth', options.memorableDate[1])
-			.fill('memorableYear',  options.memorableDate[2]);
+			.fill('memorableDay',   date.format('DD'))
+			.fill('memorableMonth', date.format('MM'))
+			.fill('memorableYear',  date.format('YYYY'));
 		} else {
 			browser.fill(key, options[key]);
 		}
