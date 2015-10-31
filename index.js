@@ -110,6 +110,7 @@ module.exports = function(options) {
 	}).then(d => {
 		clearInterval(t);
 		logUpdate(c.green('✔︎') + ' done!');
+		browser.destroy();
 		return d;
 	});
 };
