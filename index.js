@@ -44,6 +44,11 @@ module.exports = function(options) {
 		});
 	}
 
+	function cleanup() {
+		clearInterval(t);
+		browser.destroy();
+	}
+
 	return browser.visit('https://banking.smile.co.uk/SmileWeb2/start.do')
 	.then(() => {
 		log('login');
@@ -108,9 +113,11 @@ module.exports = function(options) {
 		.then(() => parseStatement(browser))
 		.then(data => recent.concat(data).sort((a, b) => a.date - b.date));
 	}).then(d => {
-		clearInterval(t);
+		cleanup();
 		logUpdate(c.green('✔︎') + ' done!');
-		browser.destroy();
 		return d;
+	}, e => {
+		cleanup();
+		throw e;
 	});
 };
