@@ -36,6 +36,7 @@ js                | cli                | notes
 `lastSchool`      | `--last-school`    |
 `firstSchool`     | `--first-school`   |
 `memorableDate`   | `--memorable-date` | `YYYY-MM-DD` format
+`silent`          | `--silent`         | Turns of progress messages.
 `earliest`        | `--earliest`       | `YYYY-MM-DD` format. Transactions before this date will be discarded
                   | `-o`               | Output file, stdout if not present. `json` and `csv` files will be formatted appropriately.
 
