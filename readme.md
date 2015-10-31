@@ -43,7 +43,9 @@ js                | cli                | notes
 caveats
 -------
 
-Stepford is not affiliated with or endorsed by The Cooperative Bank, plc. Use at your own risk. I can't guarantee it won't transfer all your money to hackers in Russia. (It doesn't, but I can't guarantee that. Something something merchantability or fitness for a particular purpose). Seriously, you might want to think twice and [read the source code](index.js) before you hand your bank security details to a chunk of Javascript you downloaded from the internet.
+Stepford is not affiliated with or endorsed by The Cooperative Bank, plc. **Use at your own risk**. I can't guarantee it won't transfer all your money to hackers in Russia. (It doesn't, but I can't guarantee that. Something something merchantability or fitness for a particular purpose.)
+
+Seriously, you might want to think twice and [read the source code](index.js) before you hand your bank security details to a chunk of Javascript you downloaded from the internet.
 
 licence
 -------
