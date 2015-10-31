@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "description": "Scrape Smile online banking",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "bin": "bin.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/quarterto/Stepford.git"
@@ -25,8 +23,10 @@
     "chalk": "^1.1.1",
     "elegant-spinner": "^1.0.1",
     "log-update": "^1.0.2",
+    "minimist": "^1.2.0",
     "moment": "^2.10.6",
     "numeral": "^1.5.3",
+    "to-csv": "^0.1.0",
     "zombie": "^4.1.0"
   }
 }
