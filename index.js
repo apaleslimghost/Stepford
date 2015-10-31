@@ -32,15 +32,15 @@ module.exports = function(options) {
 		}));
 	}
 
-	function parseStatement() {
-		var p = browser.query('#recentItemsPageCount').textContent.match(/Page (\d+ of \d+)/)[1];
-		log('parsing statement page ' + p);
+	function parseStatement(n, total) {
+		var p = browser.query('#recentItemsPageCount').textContent.match(/Page (\d+) of \d+/)[1];
+		log('parsing statement page ' + p + ' (' + n + '/' + total + ')');
 
 		if(browser.query('td.error')) return Promise.resolve([]);
 
 		var data = parseTx(browser);
 		return browser.clickLink('[title=previous]').then(() => {
-			return parseStatement().then(prev => prev.concat(data));
+			return parseStatement(n + 1, total).then(prev => prev.concat(data));
 		});
 	}
 
@@ -109,8 +109,11 @@ module.exports = function(options) {
 		var recent = parseTx(browser);
 
 		return browser.clickLink('[title="view previous statements"]')
-		.then(() => browser.clickLink('[title="click here to go to statement"]'))
-		.then(() => parseStatement(browser))
+		.then(() => {
+			var total = browser.queryAll('.summaryTable tbody tr').length;
+			return browser.clickLink('[title="click here to go to statement"]')
+			.then(() => parseStatement(1, total));
+		})
 		.then(data => recent.concat(data).sort((a, b) => a.date - b.date));
 	}).then(d => {
 		cleanup();
