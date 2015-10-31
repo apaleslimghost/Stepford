@@ -14,7 +14,7 @@ var out = options.o;
 var format = {
 	json: JSON.stringify,
 	csv: csv
-}[options.format || path.extname(out)] || util.inspect;
+}[options.format || path.extname(out).slice(1)] || util.inspect;
 
 var write = out ? data => fs.writeFile(out, data, 'utf8') : console.log;
 
