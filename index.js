@@ -2,7 +2,7 @@ var moment = require('moment');
 var numeral = require('numeral');
 var Browser = require('zombie');
 var spinner = require('elegant-spinner');
-var logUpdate = require('log-update');
+var logUpdate = require('log-update').create(process.stderr);
 var c = require('chalk');
 Browser.silent = true;
 
