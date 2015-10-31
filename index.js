@@ -39,6 +39,11 @@ module.exports = function(options) {
 		if(browser.query('td.error')) return Promise.resolve([]);
 
 		var data = parseTx(browser);
+
+		if(options.earliest && data.some(row => row.date < new Date(options.earliest))) {
+			return Promise.resolve(data.filter(row => row.date >= new Date(options.earliest)));
+		}
+
 		return browser.clickLink('[title=previous]').then(() => {
 			return parseStatement(n + 1, total).then(prev => prev.concat(data));
 		});
