@@ -6,6 +6,7 @@ var csv = require('to-csv');
 var path = require('path');
 var util = require('util');
 var fs = require('fs');
+var moment = require('moment');
 var extend = util._extend;
 
 var options = argv._[0] ? extend(argv, require(path.resolve(argv._[0]))) : argv;
@@ -13,7 +14,7 @@ var options = argv._[0] ? extend(argv, require(path.resolve(argv._[0]))) : argv;
 var out = options.o;
 var format = {
 	json: JSON.stringify,
-	csv: csv
+	csv: data => csv(data.map(row => (row.date = moment(row.date).format('YYYY-MM-DD'), row)))
 }[options.format || path.extname(out).slice(1)] || util.inspect;
 
 var write = out ? data => fs.writeFile(out, data, 'utf8') : console.log;
