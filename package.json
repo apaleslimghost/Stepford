@@ -1,6 +1,6 @@
 {
   "name": "stepford",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Scrape Smile online banking",
   "main": "index.js",
   "bin": "bin.js",
