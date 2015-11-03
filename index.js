@@ -18,6 +18,14 @@ module.exports = function(options) {
 
 	var browser = new Browser();
 
+	var afterEarliest = row => row.date >= new Date(options.earliest);
+	function willFilter(tx) {
+		return options.earliest && !tx.every(afterEarliest);
+	}
+	function filterTx(tx) {
+		return tx.filter(afterEarliest);
+	}
+
 	function parseTx() {
 		return browser.queryAll(':not(.verttop) > .summaryTable tbody tr')
 		.filter(row => {
@@ -34,20 +42,19 @@ module.exports = function(options) {
 		}));
 	}
 
-	function parseStatement(n, total) {
+	function parseStatementLoop(n, total) {
 		var p = browser.query('#recentItemsPageCount').textContent.match(/Page (\d+) of \d+/)[1];
 		log('parsing statement page ' + p + ' (' + n + '/' + total + ')');
 
 		if(browser.query('td.error')) return Promise.resolve([]);
 
 		var data = parseTx(browser);
-
-		if(options.earliest && data.some(row => row.date < new Date(options.earliest))) {
-			return Promise.resolve(data.filter(row => row.date >= new Date(options.earliest)));
+		if(willFilter(data)) {
+			return Promise.resolve(filterTx(data));
 		}
 
 		return browser.clickLink('[title=previous]').then(() => {
-			return parseStatement(n + 1, total).then(prev => prev.concat(data));
+			return parseStatementLoop(n + 1, total).then(prev => prev.concat(data));
 		});
 	}
 
@@ -115,12 +122,15 @@ module.exports = function(options) {
 		log('parsing recent items');
 		browser.assert.text('title', 'recent items');
 		var recent = parseTx(browser);
+		if(willFilter(recent)) {
+			return filterTx(recent);
+		}
 
 		return browser.clickLink('[title="view previous statements"]')
 		.then(() => {
 			var total = browser.queryAll('.summaryTable tbody tr').length;
 			return browser.clickLink('[title="click here to go to statement"]')
-			.then(() => parseStatement(1, total));
+			.then(() => parseStatementLoop(1, total));
 		})
 		.then(data => recent.concat(data).sort((a, b) => a.date - b.date));
 	}).then(d => {
