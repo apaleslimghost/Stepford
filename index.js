@@ -1,3 +1,5 @@
+'use strict';
+
 var moment = require('moment');
 var numeral = require('numeral');
 var Browser = require('zombie');
