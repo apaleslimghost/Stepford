@@ -44,7 +44,7 @@ module.exports = function(options) {
 
 	function parseStatementLoop(n, total) {
 		var p = browser.query('#recentItemsPageCount').textContent.match(/Page (\d+) of \d+/)[1];
-		log('parsing statement page ' + p + ' (' + n + '/' + total + ')');
+		log(`parsing statement page ${p} + (${n}/${total})`);
 
 		if(browser.query('td.error')) return Promise.resolve([]);
 
@@ -135,7 +135,7 @@ module.exports = function(options) {
 		.then(data => recent.concat(data).sort((a, b) => a.date - b.date));
 	}).then(d => {
 		cleanup();
-		logUpdate(c.green('✔︎') + ' done!');
+		logUpdate(`${c.green('✔︎')} extracted ${d.length} transactions`);
 		return d;
 	}, e => {
 		cleanup();
