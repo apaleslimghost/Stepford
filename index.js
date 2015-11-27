@@ -109,6 +109,11 @@ module.exports = function(options) {
 		return browser.click('[name=ok]');
 	})
 	.then(() => {
+		if(browser.query('title').text() === 'smile noticeboard') {
+			return browser.click('[name=ok]');
+		}
+	})
+	.then(() => {
 		log('home');
 		browser.assert.text('title', 'home'); // what
 		var acctCell = browser.queryAll('.dataRowBB').find(el =>
