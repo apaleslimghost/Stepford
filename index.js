@@ -106,10 +106,13 @@ module.exports = function(options) {
 			browser.fill(key, options[key]);
 		}
 
-		return browser.click('[name=ok]');
+		return browser.click('[name=ok]').catch(() => {
+			// yeah, no idea
+		});
 	})
 	.then(() => {
-		if(browser.query('title').text() === 'smile noticeboard') {
+		if(browser.query('title').textContent.trim() === 'smile noticeboard') {
+			log('noticeboard');
 			return browser.click('[name=ok]');
 		}
 	})
