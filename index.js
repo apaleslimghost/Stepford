@@ -139,6 +139,11 @@ module.exports = function(options) {
 		})
 		.then(data => recent.concat(data).sort((a, b) => a.date - b.date));
 	}).then(d => {
+		return [].concat(options.plugins || []).reduce(
+			(last, plugin) => last.then(plugin),
+			Promise.resolve()
+		).then(() => d);
+	}).then(d => {
 		cleanup();
 		logUpdate(`${c.green('✔︎')} extracted ${d.length} transactions`);
 		return d;
