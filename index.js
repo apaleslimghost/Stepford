@@ -11,8 +11,8 @@ Browser.silent = true;
 module.exports = function(options) {
 	var currentMessage = 'loading…';
 	var tickSpinner = spinner();
-	var log = options.silent ? () => {} : (msg) => currentMessage = msg;
-	var t = options.silent || setInterval(() => {
+	var log = options.silent ? () => {} : (options.log || (msg) => currentMessage = msg);
+	var t = (options.silent || options.log) || setInterval(() => {
 		logUpdate(c.cyan.bold(tickSpinner()) + ' ' + c.grey(currentMessage));
 	}, 50);
 
