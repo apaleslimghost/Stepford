@@ -28,7 +28,7 @@ config
 
 js                | cli                | notes
 ------------------|--------------------|-------
-`sortCode`        | `--sort-code`      |
+`sortcode`        | `--sort-code`      |
 `account`         | `--account`        |
 `securityCode`    | `--security-code`  |
 `memorableName`   | `--memorable-name` |
